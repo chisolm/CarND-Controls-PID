@@ -15,7 +15,7 @@ The infrastructure code in this project is supplied from project repository list
 
 [//]: # (Image References)
 
-[image1]: ./writeup_images/Twiddle_Overview.png "Twiddle Data"
+[image1]: ./writeup_images/Twiddle_overview.png "Twiddle Data"
 [image2]: ./writeup_images/twiddle_cycles.png "Tiddle changes"
 [image3]: ./writeup_images/oscillation.png "Oscillation"
 
