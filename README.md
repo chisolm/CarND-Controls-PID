@@ -3,96 +3,111 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 
-## Dependencies
+# Overview
+This repository contains all the code needed to complete the PID control project in Udacity's Self-Driving Car Nanodegree.
 
-* cmake >= 3.5
- * All OSes: [click here for installation instructions](https://cmake.org/install/)
-* make >= 4.1(mac, linux), 3.81(Windows)
-  * Linux: make is installed by default on most Linux distros
-  * Mac: [install Xcode command line tools to get make](https://developer.apple.com/xcode/features/)
-  * Windows: [Click here for installation instructions](http://gnuwin32.sourceforge.net/packages/make.htm)
-* gcc/g++ >= 5.4
-  * Linux: gcc / g++ is installed by default on most Linux distros
-  * Mac: same deal as make - [install Xcode command line tools]((https://developer.apple.com/xcode/features/)
-  * Windows: recommend using [MinGW](http://www.mingw.org/)
-* [uWebSockets](https://github.com/uWebSockets/uWebSockets)
-  * Run either `./install-mac.sh` or `./install-ubuntu.sh`.
-  * If you install from source, checkout to commit `e94b6e1`, i.e.
-    ```
-    git clone https://github.com/uWebSockets/uWebSockets 
-    cd uWebSockets
-    git checkout e94b6e1
-    ```
-    Some function signatures have changed in v0.14.x. See [this PR](https://github.com/udacity/CarND-MPC-Project/pull/3) for more details.
-* Simulator. You can download these from the [project intro page](https://github.com/udacity/self-driving-car-sim/releases) in the classroom.
+The original repository for this project is located at: [CarND-Controls-PID](https://github.com/udacity/CarND-Controls-PID)
 
-There's an experimental patch for windows in this [PR](https://github.com/udacity/CarND-PID-Control-Project/pull/3)
+### Attribution
+The infrastructure code in this project is supplied from project repository listed above.
 
-## Basic Build Instructions
+---
 
-1. Clone this repo.
-2. Make a build directory: `mkdir build && cd build`
-3. Compile: `cmake .. && make`
-4. Run it: `./pid`. 
+[//]: # (Image References)
 
-Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
+[image1]: ./writeup_images/Twiddle_Overview.png "Twiddle Data"
+[image2]: ./writeup_images/twiddle_cycles.png "Tiddle changes"
+[image3]: ./writeup_images/oscillation.png "Oscillation"
 
-## Editor Settings
+## Running the Code
+This project involves the Term 2 Simulator which can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases)
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+This repository includes two files that can be used to set up and intall uWebSocketIO for either Linux or Mac systems. For windows you can use either Docker, VMware, or even Windows 10 Bash on Ubuntu to install uWebSocketIO.
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+Once the install for uWebSocketIO is complete, the main program can be built and ran by doing the following from the project top directory.
 
-## Code Style
+1. mkdir build
+2. cd build
+3. cmake ..
+4. make
+5. ./pid
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+##  Sucessful run
 
-## Project Instructions and Rubric
+With the settings chosen from a manual search of settings a starting default value of:
 
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+```
+  pid.Init(0.20, 0.001, 2.7);  // order is P I D 
+```
 
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/e8235395-22dd-4b87-88e0-d108c5e5bbf4/concepts/6a4d8d42-6a04-4aa6-b284-1697c0fd6562)
-for instructions and the project rubric.
+The manual tuning was required to get a stable set of values such that using twiddle and it's adjustments were unlikely to run the car off the track.
 
-## Hints!
+One big tool that is missing in this project is a way to reset the car to start so that the successive runs can encounter the same conditions.
 
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
+It's unclear that using twiddle on the live running car will converge or give
+useful data.  I am running with short evaluation times of 200 data points.  A
+longer time near the time of a full track loop may give good data without the
+need to reset the car to a common starting point.
 
-## Call for IDE Profiles Pull Requests
+The car will complete any number of loops with a target speed of 25 mph.  It will actually run successfully at 50mph, but I dropped the target speed to 25
+to experiment with a twiddle search on parameters.
 
-Help your fellow students!
+The following is an overview of a longer twiddle search with about 17 laps and 120 twiddle 'cycles'.  The way I'm defining a cycle in this case is a test of
+a parameter change.  Since a twiddle loop includes an increment up and an increment down, it could have 2 cycles by this definition.
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
+The 17 laps can be seen by the i_err shape based on the shape of the track.
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
+![alt text][image1]
 
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
+The p[3] and dp[3] parameters and their changes in the mentioned 120 twiddle cycles are presented below.  There are 4 scales to get the data on the same
+graph.  I won't be using the scales, only the trends and relative values.
 
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
+Note the parameter order here is PDI as used in the lessons.
+```
+  p[0] = Kp; p[1] = Kd; p[2] = Ki;
+  dp[0] = 0.02;
+  dp[1] = 0.2;
+  dp[2] = 0.0001;
+```
 
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
+Note that all 3 dp values have a downward trend.  It is uncertain with this testing method that twiddle will converge, although the somewhat consistent
+downward trend of dp values suggests it will.
 
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
+![alt text][image2]
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+P2 still has an upward trend.  P0 and P1 are somewhat stable near the initial
+manually searched.
+
+The downward trend of dp2 with the generally upward trend of p2 suggests a problem.  This parameter is likely most succeptable to position on the track and the short testing cycle.  It would probably benefit from a much longer 
+evaluation time.  (Or a consistent reset method.)
+
+The ossilation of steering value at time suggests that p1 could be significantly higher.  My manual search did not do well much higher p1 values, although those tests were down with a target speed of 50 mph.
+
+The oscilations seen here some of the larger ones seen in my testing.  There is a noticeable error problem shortly after the bridge and near the dirt entrance that seems to have a discontinous CTE value that almost always generates some degree of oscillation for my model.
+
+![alt text][image3]
+
+## Rubric
+
+### Your code should compile.
+It does with the default procedure.
+
+### The PID procedure follows what was taught in the lessons.
+
+It follows the PID procedure.
+
+### Describe the effect each of the P, I, D components had in your implementation.
+
+For the description, see above.
+
+### Describe how the final hyperparameters were chosen.
+
+See above.  The initial values were chosen by a manual search with input from the class lesson.  The twiddle search values are still converging.
+
+### The vehicle must successfully drive a lap around the track.
+
+It does.  It also does even with the twiddle parameter search continueing.
+
+
+
 
