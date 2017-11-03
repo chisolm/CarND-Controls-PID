@@ -17,7 +17,7 @@ void PID::Init(double Kp, double Ki, double Kd) {
     i_error = 0.0;
     d_error = 0.0;
 
-    best_error = std::numeric_limits<double>::max();
+    best_error = 1000000000000;
     total_error = 0.0;
 
     p[0] = Kp; p[1] = Kd; p[2] = Ki;
@@ -125,4 +125,5 @@ double PID::SteerValue() {
 }
 
 double PID::ThrottleValue() {
+    return(0);
 }
