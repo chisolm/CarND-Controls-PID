@@ -111,7 +111,7 @@ void PID::UpdateError(double cte) {
 }
 
 double PID::TotalError() {
-    return total_error;
+    return - p[0] * p_error - p[1] * d_error - p[2] * i_error;
 }
 
 double PID::SteerValue() {

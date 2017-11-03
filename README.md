@@ -18,6 +18,10 @@ The infrastructure code in this project is supplied from project repository list
 [image1]: ./writeup_images/Twiddle_overview.png "Twiddle Data"
 [image2]: ./writeup_images/twiddle_cycles.png "Tiddle changes"
 [image3]: ./writeup_images/oscillation.png "Oscillation"
+[image4]: ./writeup_images/pid_overview.png "PID Overview"
+[image5]: ./writeup_images/p_comp.png "P error view"
+[image6]: ./writeup_images/d_comp.png "D error view"
+[image7]: ./writeup_images/i_comp.png "I error view"
 
 ## Running the Code
 This project involves the Term 2 Simulator which can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases)
@@ -98,7 +102,29 @@ It follows the PID procedure.
 
 ### Describe the effect each of the P, I, D components had in your implementation.
 
-For the description, see above.
+Here is an overview of the components controlling the steering angle.
+Displayed are the p_error, d_error and i_error terms.  Also displayed are the products of those terms and their p[0-2] values.  For example p_error * p[0] is labeled as p_err_p0.
+
+![alt text][image4]
+
+The graph is somewhat confusing, so I'll break it down starting with the
+p_error related components.  In the image below, the p_err line is not
+visable as it is equal to cte, as can be seen in the boxed values.
+
+The p_err_p0 product can be seen as a scaled version of p_err as expected.
+
+![alt text][image5]
+
+The d_err can be seen in the next plot as a derivitive(approximate) of the
+CTE.  It is positive as the cte is increasing and negative as it is decreasing.  This ends up reinforcing the P component when CTE is still increasing giving it a counter steer effect on the steering as D(CTE slope) goes negative.
+
+NOTE that the "spikiness" in the steering angle comes from the d_err component.  The simple subtraction of the previous cte value does not produce a smooth function.  Some additional prior values would not likely impede the intent of the D component and likely smooth it out.
+
+![alt text][image6]
+
+As can be seen on any given steering adjustment the i_error and i_err_p2 product are not significantly affected.  If you look at the overview data in one of the first graphs in this presentation, the values do reflect the shape of the track.  The i_error component goes negative only in the section of the track where the car does a right turn.  This does suggest the car simulation has a bias based on the direction it is turning.
+
+![alt text][image7]
 
 ### Describe how the final hyperparameters were chosen.
 
